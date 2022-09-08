@@ -1,10 +1,10 @@
 const express = require('express');
 
 const moviesRouter = express.Router();
-// const {
-//   cardIdValidation,
-//   createCardValidation,
-// } = require('../middlewares/validations');
+const {
+  movieIdValidation,
+  createMovieValidation,
+} = require('../middlewares/validations');
 
 const {
   getMovies,
@@ -14,8 +14,8 @@ const {
 
 moviesRouter.get('/movies', getMovies);
 
-moviesRouter.post('/movies', createMovie);
+moviesRouter.post('/movies', createMovieValidation, createMovie);
 
-moviesRouter.delete('/movies/:movieId', deleteMovie);
+moviesRouter.delete('/movies/:movieId', movieIdValidation, deleteMovie);
 
 module.exports = { moviesRouter };

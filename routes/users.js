@@ -3,14 +3,12 @@ const express = require('express');
 const usersRouter = express.Router();
 const { updateUser, getCurrentUser } = require('../controllers/users');
 
-// const {
-//   userIdValidation,
-//   updateUserdValidation,
-//   updateAvatardValidation,
-// } = require('../middlewares/validations');
+const {
+  updateUserdValidation,
+} = require('../middlewares/validations');
 
 usersRouter.get('/users/me', getCurrentUser);
 
-usersRouter.patch('/users/me', updateUser);
+usersRouter.patch('/users/me', updateUserdValidation, updateUser);
 
 module.exports = { usersRouter };
