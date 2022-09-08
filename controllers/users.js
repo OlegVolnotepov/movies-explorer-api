@@ -20,14 +20,14 @@ const getUserId = (req, res, next) => {
 };
 
 const createUser = (req, res, next) => {
-  const { email, password } = req.body;
+  const { email, password, name } = req.body;
 
   bcrypt
     .hash(password, 10)
     .then((hash) => User.create({
       email,
       password: hash,
-      name: req.body.name,
+      name,
     }))
     .then((user) => {
       res.send({
