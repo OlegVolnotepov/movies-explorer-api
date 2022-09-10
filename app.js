@@ -1,19 +1,12 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const limiter = require('express-rate-limit');
 const { errors } = require('celebrate');
 const mongoose = require('mongoose');
-const { usersRouter } = require('./routes/users');
-const { moviesRouter } = require('./routes/movies');
-const NotFoundError = require('./utils/errors/NotFoundError');
-const { login, createUser } = require('./controllers/users');
-const auth = require('./middlewares/auth');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
-const {
-  loginValidation,
-  registerValidation,
-} = require('./middlewares/validations');
-
-require('dotenv').config();
+const routes = require('./routes/index');
+const { limiterParams } = require('./utils/constants');
 
 const app = express();
 app.use(cors());
@@ -24,10 +17,12 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use(limiter(limiterParams));
+
 const {
   PORT = 3003,
   DATABASE_URL,
-  NODE_ENV = 'mongodb://localhost:27017/bitfilmsdb',
+  NODE_ENV,
 } = process.env;
 mongoose.connect(
   NODE_ENV === 'production'
@@ -48,23 +43,9 @@ mongoose.connect(
 //   next();
 // });
 app.use(requestLogger);
-// app.get('/crash-test', () => {
-//   setTimeout(() => {
-//     throw new Error('Сервер сейчас упадёт');
-//   }, 0);
-// });
-app.post('/signin', loginValidation, login);
-app.post('/signup', registerValidation, createUser);
 
-app.use(auth);
+app.use(routes);
 
-app.use(usersRouter);
-
-app.use(moviesRouter);
-
-app.use('*', (req, res, next) => {
-  next(new NotFoundError('Страница не найдена'));
-});
 app.use(errorLogger);
 
 app.use(errors());

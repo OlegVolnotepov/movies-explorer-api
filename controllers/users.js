@@ -8,17 +8,6 @@ const BadRequestError = require('../utils/errors/BadRequestError');
 const NotFoundError = require('../utils/errors/NotFoundError');
 const ConflictError = require('../utils/errors/ConflictError');
 
-const getUserId = (req, res, next) => {
-  User.findById(req.params.userId)
-    .then((user) => {
-      if (!user) {
-        return next(new NotFoundError('Пользователь не найден'));
-      }
-      return res.send(user);
-    })
-    .catch(next);
-};
-
 const createUser = (req, res, next) => {
   const { email, password, name } = req.body;
 
@@ -38,8 +27,7 @@ const createUser = (req, res, next) => {
     .catch((err) => {
       if (err.code === 11000) {
         next(new ConflictError('Пользователь с таким email уже существует'));
-      }
-      if (err.name === 'ValidationError') {
+      } else if (err.name === 'ValidationError') {
         next(new BadRequestError(err.message));
       } else {
         next(err);
@@ -66,6 +54,14 @@ const login = (req, res, next) => {
 
 const updateUser = (req, res, next) => {
   const userId = req.user._id;
+  const { email } = req.body;
+  User.findOne({ email }).then((user) => {
+    if (user) {
+      return next(new ConflictError('Email уже занят'));
+    }
+    return next();
+  }).catch(next);
+
   User.findByIdAndUpdate(
     userId,
     {
@@ -110,7 +106,6 @@ const getCurrentUser = (req, res, next) => {
 };
 
 module.exports = {
-  getUserId,
   createUser,
   updateUser,
   login,
