@@ -12,7 +12,7 @@ const getMovies = (req, res, next) => {
     .then((movies) => {
       if (!movies || movies.length === 0) {
         //res.send({ message: 'Сохраненных фильмов не найдено.' });
-        return next(new NotFoundError('Сохраненных фильмов не найдено.!!'));
+        return next(new NotFoundError('Сохраненных фильмов не найдено.'));
       }
       res.send(movies);
     })
