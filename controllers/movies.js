@@ -11,7 +11,7 @@ const getMovies = (req, res, next) => {
   Movies.find({ owner })
     .then((movies) => {
       if (!movies || movies.length === 0) {
-        res.send('Сохраненных фильмов не найдено.');
+        res.send({ message: 'Сохраненных фильмов не найдено.' });
       }
       res.send(movies);
     })
